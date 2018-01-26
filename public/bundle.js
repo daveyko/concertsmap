@@ -36924,6 +36924,8 @@ var Home = function (_Component) {
     _this.removeAllConcerts = _this.removeAllConcerts.bind(_this);
     _this.toggleModal = _this.toggleModal.bind(_this);
     _this.requestThrottle = _this.requestThrottle.bind(_this);
+    _this.handleComponentError = _this.handleComponentError.bind(_this);
+    _this.handleDateChangeErr = _this.handleDateChangeErr.bind(_this);
     return _this;
   }
 
@@ -36934,14 +36936,25 @@ var Home = function (_Component) {
 
       this.checkLoggedIn().then(function (isLoggedIn) {
         if (isLoggedIn) {
-          _this2.checkToken().then(function () {
-            console.log('token checked!');
-          });
-          setInterval(_this2.checkToken(), 300000);
+          return _this2.checkToken();
         } else {
           _this2.toggleModal();
         }
+      }).then(function (res) {
+        console.log('token checked and valid!');
+      }).catch(function (err) {
+        console.log('err in comp did mount', err);
+        _this2.handleComponentError(err);
       });
+    }
+  }, {
+    key: 'handleComponentError',
+    value: function handleComponentError(err) {
+      if (err.response && err.response.status === 401) {
+        this.handleRefresh().then(function () {
+          console.log('token refreshed!');
+        });
+      }
     }
   }, {
     key: 'toggleModal',
@@ -36963,25 +36976,15 @@ var Home = function (_Component) {
           }
         });
       } catch (error) {
-        if (error.response) {
-          console.log('error response', error.response);
-          if (error.response.status === 401) {
-            try {
-              raw = await this.handleRefresh();
-            } catch (e) {
-              console.log('handleRefreshError', e);
-            }
-          }
-        }
-      } finally {
-        console.log('raw', raw);
-        return raw;
+        throw error;
       }
+      return raw;
     }
   }, {
     key: 'requestThrottle',
     value: async function requestThrottle(combinedData) {
       var addedGenres = [];
+
       function delay() {
         return new Promise(function (resolve) {
           return setTimeout(resolve, 5000);
@@ -36994,7 +36997,7 @@ var Home = function (_Component) {
           console.log('25 requests made!');
           await delay();
         } catch (e) {
-          console.log('reqthrottleerrr!');
+          console.log('reqthrottleerrr!', e);
           throw e;
         }
       }
@@ -37133,7 +37136,7 @@ var Home = function (_Component) {
         refreshToken: sessionStorage.getItem('currentRefreshToken')
       });
       console.log('refresh response!', body);
-      sessionStorage.setItem('currentAccessToken', body.accessToken);
+      sessionStorage.setItem('currentAccessToken', body.data.accessToken);
       return body;
     }
   }, {
@@ -37177,29 +37180,51 @@ var Home = function (_Component) {
       return wrapper;
     }
   }, {
+    key: 'checkCacheConcerts',
+    value: async function checkCacheConcerts(date) {
+      var totalPages = void 0;
+      var rawAjaxConcerts = void 0;
+      var requestPromise = void 0;
+      var getRequestPromises = [];
+      var allConcerts = void 0;
+      if (sessionStorage.getItem(JSON.stringify(date))) {
+        console.log('CACHED!');
+        return { cached: JSON.parse(sessionStorage.getItem(JSON.stringify(date))) };
+      } else {
+        rawAjaxConcerts = await _axios2.default.get('http://api.songkick.com/api/3.0/metro_areas/7644/calendar.json?apikey=SplxOabkNDI5R6lO&min_date=' + date.format('YYYY-MM-DD') + '&max_date=' + date.format('YYYY-MM-DD'));
+        totalPages = Math.ceil(rawAjaxConcerts.data.resultsPage.totalEntries / 50);
+        for (var page = 1; page <= totalPages; page++) {
+          requestPromise = _axios2.default.get('http://api.songkick.com/api/3.0/metro_areas/7644/calendar.json?apikey=SplxOabkNDI5R6lO&min_date=' + date.format('YYYY-MM-DD') + '&max_date=' + date.format('YYYY-MM-DD') + '&page=' + page);
+          getRequestPromises.push(requestPromise);
+        }
+        allConcerts = await Promise.all(getRequestPromises);
+        sessionStorage.setItem(JSON.stringify(date), JSON.stringify(allConcerts));
+        return { nonCached: allConcerts };
+      }
+    }
+  }, {
     key: 'handleDateChange',
     value: function handleDateChange(date) {
       var _this5 = this;
 
+      var groupedCombinedData = void 0;
       this.setState({
         startDate: date
       });
-      var groupedCombinedData = void 0;
-      _axios2.default.get('http://api.songkick.com/api/3.0/metro_areas/7644/calendar.json?apikey=SplxOabkNDI5R6lO&min_date=' + date.format('YYYY-MM-DD') + '&max_date=' + date.format('YYYY-MM-DD')).then(function (res) {
-        var totalPages = Math.ceil(res.data.resultsPage.totalEntries / 50);
-        var getRequestPromises = [];
-        for (var page = 1; page <= totalPages; page++) {
-          var requestPromise = _axios2.default.get('http://api.songkick.com/api/3.0/metro_areas/7644/calendar.json?apikey=SplxOabkNDI5R6lO&min_date=' + date.format('YYYY-MM-DD') + '&max_date=' + date.format('YYYY-MM-DD') + '&page=' + page);
-          getRequestPromises.push(requestPromise);
+      this.checkCacheConcerts(date).then(function (results) {
+        if (results.cached) {
+          console.log('CACHED!', results);
+          groupedCombinedData = results.cached;
+          return groupedCombinedData;
+        } else {
+          var combinedData = [];
+          results.nonCached.forEach(function (dataPage) {
+            combinedData = combinedData.concat(dataPage.data.resultsPage.results.event);
+          });
+          groupedCombinedData = _this5.groupInto25(combinedData);
+          sessionStorage.setItem(JSON.stringify(date), JSON.stringify(groupedCombinedData));
+          return _this5.requestThrottle(groupedCombinedData);
         }
-        return Promise.all(getRequestPromises);
-      }).then(function (results) {
-        var combinedData = [];
-        results.forEach(function (dataPage) {
-          combinedData = combinedData.concat(dataPage.data.resultsPage.results.event);
-        });
-        groupedCombinedData = _this5.groupInto25(combinedData);
-        return _this5.requestThrottle(groupedCombinedData);
       }).then(function (addedGenres) {
         var genres = _this5.getTopGenres(addedGenres);
         sessionStorage.setItem('allConcerts', JSON.stringify(addedGenres));
@@ -37207,7 +37232,24 @@ var Home = function (_Component) {
           genres: genres,
           concerts: addedGenres
         });
-      }).catch(console.error);
+      }).catch(function (err) {
+        console.log('error in HandleDateChange!', err);
+        _this5.handleDateChangeErr(err, date);
+      });
+    }
+  }, {
+    key: 'handleDateChangeErr',
+    value: function handleDateChangeErr(err, date) {
+      var _this6 = this;
+
+      if (err.response && err.response.status === 401) {
+        this.handleRefresh().then(function () {
+          console.log('calling handleDateChange again after token refresh!');
+          _this6.handleDateChange(date);
+        });
+      } else {
+        console.log('datechangeerr not 401', err);
+      }
     }
   }, {
     key: 'addConcert',

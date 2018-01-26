@@ -28,21 +28,35 @@ export default class Home extends Component{
     this.removeAllConcerts = this.removeAllConcerts.bind(this)
     this.toggleModal = this.toggleModal.bind(this)
     this.requestThrottle = this.requestThrottle.bind(this)
+    this.handleComponentError = this.handleComponentError.bind(this)
+    this.handleDateChangeErr = this.handleDateChangeErr.bind(this)
   }
 
   componentDidMount(){
     this.checkLoggedIn()
     .then(isLoggedIn => {
       if (isLoggedIn){
-        this.checkToken()
-        .then(() => {
-          console.log('token checked!')
-        })
-        setInterval(this.checkToken(), 300000)
+        return this.checkToken()
       } else {
         this.toggleModal()
       }
     })
+    .then(res => {
+        console.log('token checked and valid!')
+    })
+    .catch(err => {
+      console.log('err in comp did mount', err)
+      this.handleComponentError(err)
+    })
+  }
+
+  handleComponentError(err){
+    if (err.response && err.response.status === 401){
+      this.handleRefresh()
+      .then(() => {
+        console.log('token refreshed!')
+      })
+    }
   }
 
   toggleModal(){
@@ -62,24 +76,14 @@ export default class Home extends Component{
       }
     })
   } catch(error){
-    if (error.response){
-      console.log('error response', error.response)
-      if (error.response.status === 401){
-          try {
-            raw = await this.handleRefresh()
-          } catch(e){
-            console.log('handleRefreshError', e)
-          }
-        }
-      }
-    } finally {
-      console.log('raw', raw)
-      return raw
-    }
+    throw (error)
+  }
+  return raw
   }
 
-  async requestThrottle(combinedData){
+  async requestThrottle(combinedData, date){
     let addedGenres = []
+
     function delay(){
       return new Promise(resolve => setTimeout(resolve, 5000))
     }
@@ -90,7 +94,8 @@ export default class Home extends Component{
         console.log('25 requests made!')
         await delay()
       } catch(e){
-        console.log('reqthrottleerrr!')
+        sessionStorage.removeItem(JSON.stringify(date))
+        console.log('reqthrottleerrr!', e)
         throw e
       }
     }
@@ -216,7 +221,7 @@ export default class Home extends Component{
      refreshToken: sessionStorage.getItem('currentRefreshToken')
    })
    console.log('refresh response!', body)
-   sessionStorage.setItem('currentAccessToken', body.accessToken)
+   sessionStorage.setItem('currentAccessToken', body.data.accessToken)
    return body
   }
 
@@ -258,28 +263,48 @@ export default class Home extends Component{
   }
 
 
+  async checkCacheConcerts(date){
+    let totalPages
+    let rawAjaxConcerts
+    let requestPromise
+    let getRequestPromises = []
+    let allConcerts
+    if (sessionStorage.getItem(JSON.stringify(date))){
+      console.log('CACHED!')
+      return {cached: JSON.parse(sessionStorage.getItem(JSON.stringify(date)))}
+    } else {
+      rawAjaxConcerts = await axios.get(`http://api.songkick.com/api/3.0/metro_areas/7644/calendar.json?apikey=SplxOabkNDI5R6lO&min_date=${date.format('YYYY-MM-DD')}&max_date=${date.format('YYYY-MM-DD')}`)
+      totalPages = Math.ceil(rawAjaxConcerts.data.resultsPage.totalEntries / 50)
+      for (let page = 1; page <= totalPages; page++){
+        requestPromise = axios.get(`http://api.songkick.com/api/3.0/metro_areas/7644/calendar.json?apikey=SplxOabkNDI5R6lO&min_date=${date.format('YYYY-MM-DD')}&max_date=${date.format('YYYY-MM-DD')}&page=${page}`)
+        getRequestPromises.push(requestPromise)
+      }
+      allConcerts = await Promise.all(getRequestPromises)
+      return {nonCached: allConcerts}
+    }
+  }
+
+
   handleDateChange(date){
+    let groupedCombinedData
     this.setState({
       startDate: date,
     })
-    let groupedCombinedData
-     axios.get(`http://api.songkick.com/api/3.0/metro_areas/7644/calendar.json?apikey=SplxOabkNDI5R6lO&min_date=${date.format('YYYY-MM-DD')}&max_date=${date.format('YYYY-MM-DD')}`)
-    .then(res => {
-      let totalPages = Math.ceil(res.data.resultsPage.totalEntries / 50)
-      let getRequestPromises = []
-      for (let page = 1; page <= totalPages; page++){
-        let requestPromise = axios.get(`http://api.songkick.com/api/3.0/metro_areas/7644/calendar.json?apikey=SplxOabkNDI5R6lO&min_date=${date.format('YYYY-MM-DD')}&max_date=${date.format('YYYY-MM-DD')}&page=${page}`)
-        getRequestPromises.push(requestPromise)
-      }
-      return Promise.all(getRequestPromises)
-    })
+    this.checkCacheConcerts(date)
     .then(results => {
-      let combinedData = []
-      results.forEach(dataPage => {
-        combinedData = combinedData.concat(dataPage.data.resultsPage.results.event)
-      })
-      groupedCombinedData = this.groupInto25(combinedData)
-      return this.requestThrottle(groupedCombinedData)
+      if (results.cached){
+        console.log('CACHED!', results)
+        groupedCombinedData = results.cached
+        return groupedCombinedData
+      } else {
+        let combinedData = []
+        results.nonCached.forEach(dataPage => {
+          combinedData = combinedData.concat(dataPage.data.resultsPage.results.event)
+        })
+        groupedCombinedData = this.groupInto25(combinedData)
+        sessionStorage.setItem(JSON.stringify(date), JSON.stringify(groupedCombinedData))
+        return this.requestThrottle(groupedCombinedData, date)
+      }
     })
     .then(addedGenres => {
       let genres = this.getTopGenres(addedGenres)
@@ -289,10 +314,25 @@ export default class Home extends Component{
         concerts: addedGenres
       })
     })
-    .catch(console.error)
+    .catch(err => {
+      console.log('error in HandleDateChange!', err)
+      this.handleDateChangeErr(err, date)
+  })
   }
 
-  addConcert(selectedConcert){
+  handleDateChangeErr(err, date){
+    if (err.response && err.response.status === 401){
+      this.handleRefresh()
+      .then(() => {
+        console.log('calling handleDateChange again after token refresh!')
+        this.handleDateChange(date)
+      })
+    } else {
+      console.log('datechangeerr not 401', err)
+    }
+  }
+
+  addConcert(selectedConcert) {
 
     if (!this.state.selectedConcerts.filter(concert => {
       return concert.displayName === selectedConcert.displayName

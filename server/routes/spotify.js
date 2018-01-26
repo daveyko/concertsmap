@@ -25,7 +25,6 @@ function(accessToken, refreshToken, profile, done) {
 	}
 	})
 		.spread((user) => {
-			console.log('MAKING USER:', user)
 			done(null, user)
 		})
 		.catch(done)
