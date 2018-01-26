@@ -2,7 +2,7 @@ const router = require('express').Router()
 const models = require('../models')
 var request = require('request')
 const User = models.User
-require('../../secrets')
+if (process.env.NODE_ENV !== 'production') require('../../secrets')
 
 
 module.exports = router
