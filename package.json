@@ -5,8 +5,9 @@
   "main": "index.js",
   "scripts": {
     "start:dev": "webpack -w & nodemon server/index.js",
-    "start": "npm run start:dev",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "deploy": "git checkout -b deploy && webpack -p && git add -f public/bundle.js public/bundle.js.map && git commit --allow-empty -m 'Deploying' && git push --force heroku deploy:master && git checkout master && git branch -D deploy"
   },
   "keywords": [],
   "author": "",
@@ -16,6 +17,7 @@
     "babel-loader": "^6.2.10",
     "babel-preset-es2015": "^6.22.0",
     "babel-preset-react": "^6.22.0",
+    "babel-preset-stage-0": "^6.24.1",
     "chai": "3.5.0",
     "chai-spies": "0.7.1",
     "css-loader": "^0.28.7",
