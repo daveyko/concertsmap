@@ -36982,7 +36982,7 @@ var Home = function (_Component) {
     }
   }, {
     key: 'requestThrottle',
-    value: async function requestThrottle(combinedData) {
+    value: async function requestThrottle(combinedData, date) {
       var addedGenres = [];
 
       function delay() {
@@ -36997,6 +36997,7 @@ var Home = function (_Component) {
           console.log('25 requests made!');
           await delay();
         } catch (e) {
+          sessionStorage.removeItem(JSON.stringify(date));
           console.log('reqthrottleerrr!', e);
           throw e;
         }
@@ -37198,7 +37199,6 @@ var Home = function (_Component) {
           getRequestPromises.push(requestPromise);
         }
         allConcerts = await Promise.all(getRequestPromises);
-        sessionStorage.setItem(JSON.stringify(date), JSON.stringify(allConcerts));
         return { nonCached: allConcerts };
       }
     }
@@ -37223,7 +37223,7 @@ var Home = function (_Component) {
           });
           groupedCombinedData = _this5.groupInto25(combinedData);
           sessionStorage.setItem(JSON.stringify(date), JSON.stringify(groupedCombinedData));
-          return _this5.requestThrottle(groupedCombinedData);
+          return _this5.requestThrottle(groupedCombinedData, date);
         }
       }).then(function (addedGenres) {
         var genres = _this5.getTopGenres(addedGenres);
