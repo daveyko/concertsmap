@@ -20,6 +20,7 @@ export default class SelectedConcerts extends Component{
 
 
   render(){
+    console.log('SELECTEDCONCERTSRENDER!', this.props.selectedConcerts)
     return (
       <div className="panel" id="selected-concerts">
         <div>
@@ -41,19 +42,25 @@ export default class SelectedConcerts extends Component{
             </div>
         </div>
         {this.props.selectedConcerts.map(selectedConcert => {
+          let firstConcertWithImage = selectedConcert.performance.filter(performanceObj => {
+            return performanceObj.image !== ''
+          })
+          let imageSrc = firstConcertWithImage.length ? firstConcertWithImage[0].image : '/not-found.png'
           return (
-          <div key = {selectedConcert.displayName} className = "selected-concert">
-           <a href = {selectedConcert.uri}>{selectedConcert.displayName.slice(0, selectedConcert.displayName.indexOf('('))}</a>
-            <p>{selectedConcert.popularity}</p>
-           <button
-            onClick = {() => {
-             this.props.removeConcert(selectedConcert)}} id = "x">X</button>
-         </div>
+          <article className = "concert-wrapper">
+            <button
+              onClick = {() => {
+              this.props.removeConcert(selectedConcert)}} id = "x">X</button>
+            <img className = "band-image" src = {imageSrc} alt = "image not found" />
+            <div key = {selectedConcert.displayName} className = "selected-concert">
+            <a href = {selectedConcert.uri}>{selectedConcert.displayName.slice(0, selectedConcert.displayName.indexOf('('))}</a>
+              <p>{selectedConcert.popularity}</p>
+            </div>
+         </article>
           )
         })}
     </div>
     )
   }
-
 }
 

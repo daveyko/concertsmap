@@ -27,6 +27,7 @@ export default class Home extends Component{
     this.selectAllConcerts = this.selectAllConcerts.bind(this)
     this.removeAllConcerts = this.removeAllConcerts.bind(this)
     this.toggleModal = this.toggleModal.bind(this)
+    this.requestThrottle = this.requestThrottle.bind(this)
   }
 
   componentDidMount(){
@@ -42,7 +43,6 @@ export default class Home extends Component{
         this.toggleModal()
       }
     })
-
   }
 
   toggleModal(){
@@ -56,7 +56,7 @@ export default class Home extends Component{
     try {
       raw = await axios({
       method: 'GET',
-      url: `https://api.spotify.com/v1/search?q=Kaskade&type=artist&limit=1`,
+      url: `https://api.spotify.com/v1/search?q=Drake&type=artist&limit=1`,
       headers: {
         'Authorization': 'Bearer ' + sessionStorage.getItem('currentAccessToken')
       }
@@ -65,35 +65,55 @@ export default class Home extends Component{
     if (error.response){
       console.log('error response', error.response)
       if (error.response.status === 401){
-        this.handleRefresh()
-        .then(res => {
-          raw = res
-          console.log('checktokenrefreshcalled', res)
-          })
-        .catch(error => console.log('handleRefreshError', error))
+          try {
+            raw = await this.handleRefresh()
+          } catch(e){
+            console.log('handleRefreshError', e)
+          }
         }
       }
-    } finally{
+    } finally {
+      console.log('raw', raw)
       return raw
     }
   }
 
-  async getGenreWrapper(combinedData, startIdx){
+  async requestThrottle(combinedData){
+    let addedGenres = []
+    function delay(){
+      return new Promise(resolve => setTimeout(resolve, 5000))
+    }
 
-    let counter = 25
-    for (let i = startIdx; i < combinedData.length; i++){
+    for (let i = 0; i < combinedData.length; i++){
+      try{
+        addedGenres = addedGenres.concat(await this.getGenreWrapper(combinedData[i]))
+        console.log('25 requests made!')
+        await delay()
+      } catch(e){
+        console.log('reqthrottleerrr!')
+        throw e
+      }
+    }
+    return addedGenres
+  }
+
+  async getGenreWrapper(combinedData){
+    for (let i = 0; i < combinedData.length; i++){
       let performance = combinedData[i].performance
       for (let j = 0; j < performance.length; j++){
-        performance[j] = Object.assign({}, performance[j], {genres: await this.getGenre(performance[j].artist.displayName)})
-        counter --
-      }
-      if (counter === 0){
-        console.log('a bit too many requests. hold your horses. Will resume after 5 seconds')
-        setTimeout(getGenreWrapper, 5000)
+        try{
+          let resObj = await this.getGenre(performance[j].artist.displayName)
+          performance[j] = Object.assign({}, performance[j], {genres: resObj.genresArr, image: resObj.artistImage})
+        } catch(e){
+          console.log('genrewrapperERR!!!')
+          throw e
+        }
       }
     }
     return combinedData
   }
+
+
 
   async getGenre(artist){
     let raw
@@ -106,7 +126,6 @@ export default class Home extends Component{
         }
       })
     } catch (error){
-      console.log(error)
       raw = {
         data: {
           artists:{
@@ -114,15 +133,25 @@ export default class Home extends Component{
           }
         }
       }
-    } finally {
-      let genresArr = raw.data.artists.items.length ? raw.data.artists.items[0].genres : []
-      return genresArr
+      console.log('getGenreeerrr', error)
+      throw error
     }
+
+      let genresArr
+      let artistImage
+      if (raw.data.artists.items.length){
+        genresArr = raw.data.artists.items[0].genres
+        if (raw.data.artists.items[0].images.length){
+          artistImage = raw.data.artists.items[0].images[0].url
+        }
+      } else {
+        genresArr = []
+        artistImage = ''
+      }
+      return {genresArr, artistImage}
   }
 
   filterConcertsByGenre(genre){
-
-    console.log('GENRE!', genre)
     let concerts
     let allConcerts = JSON.parse(sessionStorage.getItem('allConcerts'))
     console.log('allconcerts', allConcerts)
@@ -140,9 +169,6 @@ export default class Home extends Component{
         }).length >= 1
       })
     }
-
-    console.log('filteredConcerts!', concerts)
-
     this.setState({
       concerts
     })
@@ -160,8 +186,6 @@ export default class Home extends Component{
             genresObj[word]++
           }
         })
-
-
         let genresArr = Object.keys(genresObj).map(genre => {
           return {genre, value: genresObj[genre]}
         })
@@ -188,7 +212,6 @@ export default class Home extends Component{
   }
 
   async handleRefresh(){
-
    let body = await axios.post('/api/auth/refresh', {
      refreshToken: sessionStorage.getItem('currentRefreshToken')
    })
@@ -217,11 +240,29 @@ export default class Home extends Component{
     })
   }
 
+  groupInto25(combinedData){
+    let wrapper = []
+    let grouping = []
+    let counter = 25
+    for (let i = 0; i < combinedData.length; i++){
+      grouping.push(combinedData[i])
+      counter --
+      if (counter === 0){
+        wrapper.push(grouping)
+        counter = 25
+        grouping = []
+      }
+    }
+    if (grouping.length) wrapper.push(grouping)
+    return wrapper
+  }
+
 
   handleDateChange(date){
     this.setState({
       startDate: date,
     })
+    let groupedCombinedData
      axios.get(`http://api.songkick.com/api/3.0/metro_areas/7644/calendar.json?apikey=SplxOabkNDI5R6lO&min_date=${date.format('YYYY-MM-DD')}&max_date=${date.format('YYYY-MM-DD')}`)
     .then(res => {
       let totalPages = Math.ceil(res.data.resultsPage.totalEntries / 50)
@@ -237,7 +278,8 @@ export default class Home extends Component{
       results.forEach(dataPage => {
         combinedData = combinedData.concat(dataPage.data.resultsPage.results.event)
       })
-      return this.getGenreWrapper(combinedData)
+      groupedCombinedData = this.groupInto25(combinedData)
+      return this.requestThrottle(groupedCombinedData)
     })
     .then(addedGenres => {
       let genres = this.getTopGenres(addedGenres)

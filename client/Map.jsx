@@ -40,14 +40,6 @@ export default class Map extends Component {
     })
     }
 
-    addConcertWrapper(){
-        return this.wrapped()
-    }
-
-    wrapped(){
-      console.log('fucc!')
-    }
-
     buildMarker(concert){
 
       const markerEl = document.createElement('div');

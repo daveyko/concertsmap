@@ -8,7 +8,6 @@ require('../../secrets')
 module.exports = router
 
 router.get('/', (req, res) => {
-  console.log('REQUSER', req.user)
   req.user ? res.json(req.user) : res.json({})
 })
 
@@ -19,8 +18,6 @@ router.get('/logout', (req, res) => {
 
 
 router.post('/refresh', (req, res) => {
-
-
     console.log('here at refresh!', req.body.refreshToken)
     let auth = 'Basic ' + new Buffer(process.env.SPOTIFY_CLIENT_ID + ':' + process.env.SPOTIFY_CLIENT_SECRET).toString('base64')
 
