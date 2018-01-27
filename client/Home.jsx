@@ -3,8 +3,10 @@ import Header from './Header.jsx'
 import Sidebar from './Sidebar.jsx'
 import Map from './Map.jsx'
 import Login from './Login.jsx'
+import Loading from './Loading.jsx'
 import axios from 'axios'
-require('../secrets')
+
+// require('../secrets')
 
 export default class Home extends Component{
   constructor(props){
@@ -15,7 +17,9 @@ export default class Home extends Component{
       selectedConcerts: [],
       loggedIn: false,
       genres: [],
-      modal: false
+      modal: false,
+      loadingModal: false,
+      errorMessage: ''
     }
     this.handleLogOut = this.handleLogOut.bind(this)
     this.checkLoggedIn = this.checkLoggedIn.bind(this)
@@ -38,7 +42,8 @@ export default class Home extends Component{
       if (isLoggedIn){
         return this.checkToken()
       } else {
-        this.toggleModal()
+        console.log('ISLOGGEDIN', isLoggedIn)
+        this.toggleModal('modal')()
       }
     })
     .then(res => {
@@ -59,10 +64,18 @@ export default class Home extends Component{
     }
   }
 
-  toggleModal(){
-    this.setState({
-      modal : !this.state.modal
-    })
+  toggleModal(modal){
+    return () => {
+      console.log('togglemodalcalled!', modal)
+      this.setState({
+        [modal] : !this.state[modal]
+      })
+      if (modal === 'loadingModal'){
+        this.setState({
+          errorMessage: ''
+        })
+      }
+    }
   }
 
   async checkToken(){
@@ -289,6 +302,7 @@ export default class Home extends Component{
     let groupedCombinedData
     this.setState({
       startDate: date,
+      loadingModal: true
     })
     this.checkCacheConcerts(date)
     .then(results => {
@@ -311,7 +325,8 @@ export default class Home extends Component{
       sessionStorage.setItem('allConcerts', JSON.stringify(addedGenres))
       this.setState({
         genres,
-        concerts: addedGenres
+        concerts: addedGenres,
+        loadingModal: false
       })
     })
     .catch(err => {
@@ -329,6 +344,9 @@ export default class Home extends Component{
       })
     } else {
       console.log('datechangeerr not 401', err)
+      this.setState({
+        errorMessage: 'Request failed. Please try again.'
+      })
     }
   }
 
@@ -387,6 +405,7 @@ export default class Home extends Component{
       <Header handleRefresh = {this.handleRefresh} loggedIn = {this.state.loggedIn} handleLogOut = {this.handleLogOut} />
       {this.state.modal ? <Login modal = {this.state.modal} toggleModal = {this.toggleModal} /> : null}
         <div id = "app">
+          <Loading loadingModal = {this.state.loadingModal} toggleModal = {this.toggleModal} errorMessage = {this.state.errorMessage}/>
           <Map addConcert = {this.addConcert} concerts = {this.state.concerts} />
           <Sidebar removeAllConcerts = {this.removeAllConcerts}selectAllConcerts = {this.selectAllConcerts} sortSelectedConcerts = {this.sortSelectedConcerts}
           removeConcert = {this.removeConcert} selectedConcerts = {this.state.selectedConcerts} filterConcertsByGenre = {this.filterConcertsByGenre} genres = {this.state.genres} handleDateChange = {this.handleDateChange} startDate = {this.state.startDate} />
