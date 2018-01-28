@@ -3,7 +3,7 @@ import axios from 'axios'
 import moment from 'moment'
 import DatePicker from 'react-datepicker'
 import SelectedConcerts from './SelectedConcerts.jsx'
-// import 'react-datepicker/dist/react-datepicker.css'
+require('react-datepicker/dist/react-datepicker.css')
 
 export default class Sidebar extends Component {
 

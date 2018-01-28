@@ -42,7 +42,6 @@ export default class Home extends Component{
       if (isLoggedIn){
         return this.checkToken()
       } else {
-        console.log('ISLOGGEDIN', isLoggedIn)
         this.toggleModal('modal')()
       }
     })
@@ -66,7 +65,6 @@ export default class Home extends Component{
 
   toggleModal(modal){
     return () => {
-      console.log('togglemodalcalled!', modal)
       this.setState({
         [modal] : !this.state[modal]
       })
@@ -85,7 +83,7 @@ export default class Home extends Component{
       method: 'GET',
       url: `https://api.spotify.com/v1/search?q=Drake&type=artist&limit=1`,
       headers: {
-        'Authorization': 'Bearer ' + sessionStorage.getItem('currentAccessToken')
+        'Authorization': 'Bearer ' + localStorage.getItem('currentAccessToken')
       }
     })
   } catch(error){
@@ -104,10 +102,9 @@ export default class Home extends Component{
     for (let i = 0; i < combinedData.length; i++){
       try{
         addedGenres = addedGenres.concat(await this.getGenreWrapper(combinedData[i]))
-        console.log('25 requests made!')
         await delay()
       } catch(e){
-        sessionStorage.removeItem(JSON.stringify(date))
+        localStorage.removeItem(JSON.stringify(date))
         console.log('reqthrottleerrr!', e)
         throw e
       }
@@ -140,7 +137,7 @@ export default class Home extends Component{
         method: 'GET',
         url: `https://api.spotify.com/v1/search?q=${artist}&type=artist&limit=1`,
         headers: {
-          'Authorization': 'Bearer ' + sessionStorage.getItem('currentAccessToken')
+          'Authorization': 'Bearer ' + localStorage.getItem('currentAccessToken')
         }
       })
     } catch (error){
@@ -171,8 +168,7 @@ export default class Home extends Component{
 
   filterConcertsByGenre(genre){
     let concerts
-    let allConcerts = JSON.parse(sessionStorage.getItem('allConcerts'))
-    console.log('allconcerts', allConcerts)
+    let allConcerts = JSON.parse(localStorage.getItem('allConcerts'))
     if (genre === 'all'){
       concerts = allConcerts
     } else if (genre === 'n/a'){
@@ -224,17 +220,16 @@ export default class Home extends Component{
   handleLogOut(){
     axios.get('/api/auth/logout')
     .then(() => {
-      sessionStorage.clear()
+      localStorage.clear()
       this.setState({loggedIn: false})
     })
   }
 
   async handleRefresh(){
    let body = await axios.post('/api/auth/refresh', {
-     refreshToken: sessionStorage.getItem('currentRefreshToken')
+     refreshToken: localStorage.getItem('currentRefreshToken')
    })
-   console.log('refresh response!', body)
-   sessionStorage.setItem('currentAccessToken', body.data.accessToken)
+   localStorage.setItem('currentAccessToken', body.data.accessToken)
    return body
   }
 
@@ -243,13 +238,13 @@ export default class Home extends Component{
       axios.get('/api/auth')
       .then(res => {
         if (Object.keys(res.data).length === 0 && res.data.constructor === Object) {
-          sessionStorage.clear()
+          localStorage.clear()
           this.setState({loggedIn: false})
           resolve(false)
         }
         else {
-          sessionStorage.setItem('currentAccessToken', res.data.accessToken)
-          sessionStorage.setItem('currentRefreshToken', res.data.refreshToken)
+          localStorage.setItem('currentAccessToken', res.data.accessToken)
+          localStorage.setItem('currentRefreshToken', res.data.refreshToken)
           this.setState({loggedIn: true})
           resolve(true)
         }
@@ -282,9 +277,8 @@ export default class Home extends Component{
     let requestPromise
     let getRequestPromises = []
     let allConcerts
-    if (sessionStorage.getItem(JSON.stringify(date))){
-      console.log('CACHED!')
-      return {cached: JSON.parse(sessionStorage.getItem(JSON.stringify(date)))}
+    if (localStorage.getItem(JSON.stringify(date))){
+      return {cached: JSON.parse(localStorage.getItem(JSON.stringify(date)))}
     } else {
       rawAjaxConcerts = await axios.get(`http://api.songkick.com/api/3.0/metro_areas/7644/calendar.json?apikey=SplxOabkNDI5R6lO&min_date=${date.format('YYYY-MM-DD')}&max_date=${date.format('YYYY-MM-DD')}`)
       totalPages = Math.ceil(rawAjaxConcerts.data.resultsPage.totalEntries / 50)
@@ -307,7 +301,6 @@ export default class Home extends Component{
     this.checkCacheConcerts(date)
     .then(results => {
       if (results.cached){
-        console.log('CACHED!', results)
         groupedCombinedData = results.cached
         return groupedCombinedData
       } else {
@@ -316,13 +309,13 @@ export default class Home extends Component{
           combinedData = combinedData.concat(dataPage.data.resultsPage.results.event)
         })
         groupedCombinedData = this.groupInto25(combinedData)
-        sessionStorage.setItem(JSON.stringify(date), JSON.stringify(groupedCombinedData))
+        localStorage.setItem(JSON.stringify(date), JSON.stringify(groupedCombinedData))
         return this.requestThrottle(groupedCombinedData, date)
       }
     })
     .then(addedGenres => {
       let genres = this.getTopGenres(addedGenres)
-      sessionStorage.setItem('allConcerts', JSON.stringify(addedGenres))
+      localStorage.setItem('allConcerts', JSON.stringify(addedGenres))
       this.setState({
         genres,
         concerts: addedGenres,
@@ -339,11 +332,9 @@ export default class Home extends Component{
     if (err.response && err.response.status === 401){
       this.handleRefresh()
       .then(() => {
-        console.log('calling handleDateChange again after token refresh!')
         this.handleDateChange(date)
       })
     } else {
-      console.log('datechangeerr not 401', err)
       this.setState({
         errorMessage: 'Request failed. Please try again.'
       })
@@ -383,7 +374,7 @@ export default class Home extends Component{
 
 
     this.setState({
-      selectedConcerts: JSON.parse(sessionStorage.getItem('allConcerts')).filter((concert, pos, arr) => {
+      selectedConcerts: JSON.parse(localStorage.getItem('allConcerts')).filter((concert, pos, arr) => {
         return arr.map(concertObj => concertObj.displayName).indexOf(concert.displayName) === pos
       })
     })
@@ -397,9 +388,6 @@ export default class Home extends Component{
   }
 
   render(){
-
-    console.log('CONCERTS!', this.state)
-
     return (
       <div>
       <Header handleRefresh = {this.handleRefresh} loggedIn = {this.state.loggedIn} handleLogOut = {this.handleLogOut} />

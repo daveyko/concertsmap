@@ -20,7 +20,6 @@ export default class SelectedConcerts extends Component{
 
 
   render(){
-    console.log('SELECTEDCONCERTSRENDER!', this.props.selectedConcerts)
     return (
       <div className="panel" id="selected-concerts">
         <div>

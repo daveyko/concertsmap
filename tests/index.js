@@ -16,6 +16,11 @@ global.document = window.document;
 global.navigator = {
   userAgent: 'node.js',
 };
+global.window.URL = {
+  createObjectURL: function(file) {
+    return file.preview;
+  }
+};
 copyProps(window, global);
 
 import Enzyme from 'enzyme';

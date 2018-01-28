@@ -28936,6 +28936,8 @@ var _Home2 = _interopRequireDefault(_Home);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+// import '../public/style.css'
+
 _reactDom2.default.render(_react2.default.createElement(_Home2.default, null), document.getElementById('home'));
 
 /***/ }),
@@ -46234,7 +46236,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-__webpack_require__(574);
+// require('../secrets')
 
 var Home = function (_Component) {
   _inherits(Home, _Component);
@@ -46279,7 +46281,6 @@ var Home = function (_Component) {
         if (isLoggedIn) {
           return _this2.checkToken();
         } else {
-          console.log('ISLOGGEDIN', isLoggedIn);
           _this2.toggleModal('modal')();
         }
       }).then(function (res) {
@@ -46304,7 +46305,6 @@ var Home = function (_Component) {
       var _this3 = this;
 
       return function () {
-        console.log('togglemodalcalled!', modal);
         _this3.setState(_defineProperty({}, modal, !_this3.state[modal]));
         if (modal === 'loadingModal') {
           _this3.setState({
@@ -46329,7 +46329,7 @@ var Home = function (_Component) {
                   method: 'GET',
                   url: 'https://api.spotify.com/v1/search?q=Drake&type=artist&limit=1',
                   headers: {
-                    'Authorization': 'Bearer ' + sessionStorage.getItem('currentAccessToken')
+                    'Authorization': 'Bearer ' + localStorage.getItem('currentAccessToken')
                   }
                 });
 
@@ -46380,7 +46380,7 @@ var Home = function (_Component) {
 
               case 3:
                 if (!(i < combinedData.length)) {
-                  _context2.next = 23;
+                  _context2.next = 22;
                   break;
                 }
 
@@ -46392,37 +46392,35 @@ var Home = function (_Component) {
               case 8:
                 _context2.t1 = _context2.sent;
                 addedGenres = _context2.t0.concat.call(_context2.t0, _context2.t1);
-
-                console.log('25 requests made!');
-                _context2.next = 13;
+                _context2.next = 12;
                 return delay();
 
-              case 13:
-                _context2.next = 20;
+              case 12:
+                _context2.next = 19;
                 break;
 
-              case 15:
-                _context2.prev = 15;
+              case 14:
+                _context2.prev = 14;
                 _context2.t2 = _context2['catch'](4);
 
-                sessionStorage.removeItem(JSON.stringify(date));
+                localStorage.removeItem(JSON.stringify(date));
                 console.log('reqthrottleerrr!', _context2.t2);
                 throw _context2.t2;
 
-              case 20:
+              case 19:
                 i++;
                 _context2.next = 3;
                 break;
 
-              case 23:
+              case 22:
                 return _context2.abrupt('return', addedGenres);
 
-              case 24:
+              case 23:
               case 'end':
                 return _context2.stop();
             }
           }
-        }, _callee2, this, [[4, 15]]);
+        }, _callee2, this, [[4, 14]]);
       }));
 
       function requestThrottle(_x, _x2) {
@@ -46518,7 +46516,7 @@ var Home = function (_Component) {
                   method: 'GET',
                   url: 'https://api.spotify.com/v1/search?q=' + artist + '&type=artist&limit=1',
                   headers: {
-                    'Authorization': 'Bearer ' + sessionStorage.getItem('currentAccessToken')
+                    'Authorization': 'Bearer ' + localStorage.getItem('currentAccessToken')
                   }
                 });
 
@@ -46574,8 +46572,7 @@ var Home = function (_Component) {
     key: 'filterConcertsByGenre',
     value: function filterConcertsByGenre(genre) {
       var concerts = void 0;
-      var allConcerts = JSON.parse(sessionStorage.getItem('allConcerts'));
-      console.log('allconcerts', allConcerts);
+      var allConcerts = JSON.parse(localStorage.getItem('allConcerts'));
       if (genre === 'all') {
         concerts = allConcerts;
       } else if (genre === 'n/a') {
@@ -46638,7 +46635,7 @@ var Home = function (_Component) {
       var _this4 = this;
 
       _axios2.default.get('/api/auth/logout').then(function () {
-        sessionStorage.clear();
+        localStorage.clear();
         _this4.setState({ loggedIn: false });
       });
     }
@@ -46653,17 +46650,16 @@ var Home = function (_Component) {
               case 0:
                 _context5.next = 2;
                 return _axios2.default.post('/api/auth/refresh', {
-                  refreshToken: sessionStorage.getItem('currentRefreshToken')
+                  refreshToken: localStorage.getItem('currentRefreshToken')
                 });
 
               case 2:
                 body = _context5.sent;
 
-                console.log('refresh response!', body);
-                sessionStorage.setItem('currentAccessToken', body.data.accessToken);
+                localStorage.setItem('currentAccessToken', body.data.accessToken);
                 return _context5.abrupt('return', body);
 
-              case 6:
+              case 5:
               case 'end':
                 return _context5.stop();
             }
@@ -46685,12 +46681,12 @@ var Home = function (_Component) {
       return new Promise(function (resolve) {
         _axios2.default.get('/api/auth').then(function (res) {
           if (Object.keys(res.data).length === 0 && res.data.constructor === Object) {
-            sessionStorage.clear();
+            localStorage.clear();
             _this5.setState({ loggedIn: false });
             resolve(false);
           } else {
-            sessionStorage.setItem('currentAccessToken', res.data.accessToken);
-            sessionStorage.setItem('currentRefreshToken', res.data.refreshToken);
+            localStorage.setItem('currentAccessToken', res.data.accessToken);
+            localStorage.setItem('currentRefreshToken', res.data.refreshToken);
             _this5.setState({ loggedIn: true });
             resolve(true);
           }
@@ -46732,19 +46728,18 @@ var Home = function (_Component) {
                 getRequestPromises = [];
                 allConcerts = void 0;
 
-                if (!sessionStorage.getItem(JSON.stringify(date))) {
-                  _context6.next = 10;
+                if (!localStorage.getItem(JSON.stringify(date))) {
+                  _context6.next = 9;
                   break;
                 }
 
-                console.log('CACHED!');
-                return _context6.abrupt('return', { cached: JSON.parse(sessionStorage.getItem(JSON.stringify(date))) });
+                return _context6.abrupt('return', { cached: JSON.parse(localStorage.getItem(JSON.stringify(date))) });
 
-              case 10:
-                _context6.next = 12;
+              case 9:
+                _context6.next = 11;
                 return _axios2.default.get('http://api.songkick.com/api/3.0/metro_areas/7644/calendar.json?apikey=SplxOabkNDI5R6lO&min_date=' + date.format('YYYY-MM-DD') + '&max_date=' + date.format('YYYY-MM-DD'));
 
-              case 12:
+              case 11:
                 rawAjaxConcerts = _context6.sent;
 
                 totalPages = Math.ceil(rawAjaxConcerts.data.resultsPage.totalEntries / 50);
@@ -46752,14 +46747,14 @@ var Home = function (_Component) {
                   requestPromise = _axios2.default.get('http://api.songkick.com/api/3.0/metro_areas/7644/calendar.json?apikey=SplxOabkNDI5R6lO&min_date=' + date.format('YYYY-MM-DD') + '&max_date=' + date.format('YYYY-MM-DD') + '&page=' + page);
                   getRequestPromises.push(requestPromise);
                 }
-                _context6.next = 17;
+                _context6.next = 16;
                 return Promise.all(getRequestPromises);
 
-              case 17:
+              case 16:
                 allConcerts = _context6.sent;
                 return _context6.abrupt('return', { nonCached: allConcerts });
 
-              case 19:
+              case 18:
               case 'end':
                 return _context6.stop();
             }
@@ -46785,7 +46780,6 @@ var Home = function (_Component) {
       });
       this.checkCacheConcerts(date).then(function (results) {
         if (results.cached) {
-          console.log('CACHED!', results);
           groupedCombinedData = results.cached;
           return groupedCombinedData;
         } else {
@@ -46794,12 +46788,12 @@ var Home = function (_Component) {
             combinedData = combinedData.concat(dataPage.data.resultsPage.results.event);
           });
           groupedCombinedData = _this6.groupInto25(combinedData);
-          sessionStorage.setItem(JSON.stringify(date), JSON.stringify(groupedCombinedData));
+          localStorage.setItem(JSON.stringify(date), JSON.stringify(groupedCombinedData));
           return _this6.requestThrottle(groupedCombinedData, date);
         }
       }).then(function (addedGenres) {
         var genres = _this6.getTopGenres(addedGenres);
-        sessionStorage.setItem('allConcerts', JSON.stringify(addedGenres));
+        localStorage.setItem('allConcerts', JSON.stringify(addedGenres));
         _this6.setState({
           genres: genres,
           concerts: addedGenres,
@@ -46817,11 +46811,9 @@ var Home = function (_Component) {
 
       if (err.response && err.response.status === 401) {
         this.handleRefresh().then(function () {
-          console.log('calling handleDateChange again after token refresh!');
           _this7.handleDateChange(date);
         });
       } else {
-        console.log('datechangeerr not 401', err);
         this.setState({
           errorMessage: 'Request failed. Please try again.'
         });
@@ -46863,7 +46855,7 @@ var Home = function (_Component) {
     value: function selectAllConcerts() {
 
       this.setState({
-        selectedConcerts: JSON.parse(sessionStorage.getItem('allConcerts')).filter(function (concert, pos, arr) {
+        selectedConcerts: JSON.parse(localStorage.getItem('allConcerts')).filter(function (concert, pos, arr) {
           return arr.map(function (concertObj) {
             return concertObj.displayName;
           }).indexOf(concert.displayName) === pos;
@@ -46881,9 +46873,6 @@ var Home = function (_Component) {
   }, {
     key: 'render',
     value: function render() {
-
-      console.log('CONCERTS!', this.state);
-
       return _react2.default.createElement(
         'div',
         null,
@@ -47898,8 +47887,6 @@ var _SelectedConcerts = __webpack_require__(537);
 
 var _SelectedConcerts2 = _interopRequireDefault(_SelectedConcerts);
 
-__webpack_require__(538);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -47907,6 +47894,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+__webpack_require__(538);
 
 var Sidebar = function (_Component) {
   _inherits(Sidebar, _Component);
@@ -54900,75 +54889,74 @@ var SelectedConcerts = function (_Component) {
   }
 
   _createClass(SelectedConcerts, [{
-    key: 'handleFilter',
+    key: "handleFilter",
     value: function handleFilter(e) {
       this.setState({
         filterSelected: e.target.value
       });
     }
   }, {
-    key: 'render',
+    key: "render",
     value: function render() {
       var _this2 = this;
 
-      console.log('SELECTEDCONCERTSRENDER!', this.props.selectedConcerts);
       return _react2.default.createElement(
-        'div',
-        { className: 'panel', id: 'selected-concerts' },
+        "div",
+        { className: "panel", id: "selected-concerts" },
         _react2.default.createElement(
-          'div',
+          "div",
           null,
           _react2.default.createElement(
-            'h2',
+            "h2",
             null,
-            'Filter By'
+            "Filter By"
           ),
           _react2.default.createElement(
-            'div',
-            { className: 'filter' },
+            "div",
+            { className: "filter" },
             _react2.default.createElement(
-              'select',
-              { id: 'filter', onChange: this.handleFilter },
+              "select",
+              { id: "filter", onChange: this.handleFilter },
               _react2.default.createElement(
-                'option',
+                "option",
                 null,
-                'Choose Filter'
+                "Choose Filter"
               ),
               _react2.default.createElement(
-                'option',
-                { value: 'popularity' },
-                'Popularity'
+                "option",
+                { value: "popularity" },
+                "Popularity"
               )
             ),
             _react2.default.createElement(
-              'button',
+              "button",
               { onClick: function onClick() {
                   if (_this2.state.filterSelected) _this2.props.sortSelectedConcerts();
                 } },
-              'filter'
+              "filter"
             )
           )
         ),
         _react2.default.createElement(
-          'div',
+          "div",
           null,
           _react2.default.createElement(
-            'h2',
+            "h2",
             null,
-            'Selected Concerts'
+            "Selected Concerts"
           ),
           _react2.default.createElement(
-            'div',
-            { className: 'filter' },
+            "div",
+            { className: "filter" },
             _react2.default.createElement(
-              'button',
+              "button",
               { onClick: this.props.selectAllConcerts },
-              'Select All'
+              "Select All"
             ),
             _react2.default.createElement(
-              'button',
+              "button",
               { onClick: this.props.removeAllConcerts },
-              'Remove All'
+              "Remove All"
             )
           )
         ),
@@ -54978,27 +54966,27 @@ var SelectedConcerts = function (_Component) {
           });
           var imageSrc = firstConcertWithImage.length ? firstConcertWithImage[0].image : '/not-found.png';
           return _react2.default.createElement(
-            'article',
-            { className: 'concert-wrapper' },
+            "article",
+            { className: "concert-wrapper" },
             _react2.default.createElement(
-              'button',
+              "button",
               {
                 onClick: function onClick() {
                   _this2.props.removeConcert(selectedConcert);
-                }, id: 'x' },
-              'X'
+                }, id: "x" },
+              "X"
             ),
-            _react2.default.createElement('img', { className: 'band-image', src: imageSrc, alt: 'image not found' }),
+            _react2.default.createElement("img", { className: "band-image", src: imageSrc, alt: "image not found" }),
             _react2.default.createElement(
-              'div',
-              { key: selectedConcert.displayName, className: 'selected-concert' },
+              "div",
+              { key: selectedConcert.displayName, className: "selected-concert" },
               _react2.default.createElement(
-                'a',
+                "a",
                 { href: selectedConcert.uri },
                 selectedConcert.displayName.slice(0, selectedConcert.displayName.indexOf('('))
               ),
               _react2.default.createElement(
-                'p',
+                "p",
                 null,
                 selectedConcert.popularity
               )
@@ -57793,19 +57781,6 @@ var LoadingPage = function LoadingPage(props) {
 };
 
 exports.default = LoadingPage;
-
-/***/ }),
-/* 574 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(process) {
-
-process.env.SPOTIFY_CLIENT_ID = '6f3e7a3f6c5a4571b8ab5e85a56865f9';
-process.env.SPOTIFY_CLIENT_SECRET = '1eb00e1b6a674bb581b86b2d894aa26b';
-process.env.SPOTIFY_CALLBACK = '/api/spotify/callback';
-process.env.DATABASE_URL = 'postgres://localhost:5432/nycconcertmap';
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(14)))
 
 /***/ })
 /******/ ]);
