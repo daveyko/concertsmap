@@ -2,7 +2,7 @@ const router = require('express').Router()
 const models = require('../models')
 var request = require('request')
 const User = models.User
-require('../../secrets')
+if (process.env.NODE_ENV !== 'production') require('../../secrets')
 
 
 module.exports = router
@@ -18,6 +18,10 @@ router.get('/logout', (req, res) => {
 
 
 router.post('/refresh', (req, res) => {
+    if (!req.user){
+      res.send('Please sign in!')
+      res.redirect('/')
+    }
     console.log('here at refresh!', req.body.refreshToken)
     let auth = 'Basic ' + new Buffer(process.env.SPOTIFY_CLIENT_ID + ':' + process.env.SPOTIFY_CLIENT_SECRET).toString('base64')
 

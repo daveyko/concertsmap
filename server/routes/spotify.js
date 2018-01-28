@@ -4,7 +4,7 @@ const models = require('../models')
 const axios = require('axios')
 const User = models.User
 const SpotifyStrategy = require('passport-spotify').Strategy
-require('../../secrets')
+if (process.env.NODE_ENV !== 'production') require('../../secrets')
 
 module.exports = router
 
