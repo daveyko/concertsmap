@@ -5,7 +5,9 @@ const Modal = require('react-bootstrap-modal')
 const LoadingPage = (props) => {
   return (
     <div>
-    <Modal show = {props.loadingModal} onHide = {props.toggleModal('loadingModal')} aria-labelledby="ModalHeader" >
+    <Modal
+style = {{marginTop:
+    '230px'}} show = {props.loadingModal} onHide = {props.toggleModal('loadingModal')} aria-labelledby="ModalHeader" >
       <Modal.Header />
           <Modal.Body>
             <div className = "sign-in-wrapper">

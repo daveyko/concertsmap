@@ -301,17 +301,18 @@ export default class Home extends Component{
     this.checkCacheConcerts(date)
     .then(results => {
       if (results.cached){
+        console.log('results!', results)
         groupedCombinedData = results.cached
-        return groupedCombinedData
       } else {
         let combinedData = []
+        console.log('results!', results)
         results.nonCached.forEach(dataPage => {
           combinedData = combinedData.concat(dataPage.data.resultsPage.results.event)
         })
         groupedCombinedData = this.groupInto25(combinedData)
         localStorage.setItem(JSON.stringify(date), JSON.stringify(groupedCombinedData))
-        return this.requestThrottle(groupedCombinedData, date)
       }
+        return this.requestThrottle(groupedCombinedData, date)
     })
     .then(addedGenres => {
       let genres = this.getTopGenres(addedGenres)
