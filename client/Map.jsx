@@ -1,37 +1,28 @@
 var mapboxgl = require('mapbox-gl/dist/mapbox-gl.js')
-const { Marker } = require('mapbox-gl');
 import React, {Component} from 'react'
 
 export default class Map extends Component {
 
   constructor(props){
     super(props)
-
-    this.state = {
-
-    }
-
     this.markers = []
-
     this.buildMarker = this.buildMarker.bind(this)
   }
 
   componentWillReceiveProps(nextProps){
-
     if (nextProps.concerts !== this.props.concerts){
+      //every time new concerts are passed in, we need to remove the current markers on mapbox to be replaced with new markers
       this.markers.forEach(marker => {
         marker.remove()
       })
+      //stores all the markers to be renderd on the map
       this.markers = []
     }
   }
 
   componentDidMount(){
-
     mapboxgl.accessToken = 'pk.eyJ1IjoiZGF2aWRrbyIsImEiOiJjamFsdmhiemEydzNsMndvaTAzcDlsMzdyIn0.cgE2juAhXiZnis4o-sfEZw'
-
     const fullstackCoords = [-74.009, 40.705]
-
     this.map = new mapboxgl.Map({
       container: this.container,
       center: fullstackCoords,
@@ -41,7 +32,6 @@ export default class Map extends Component {
     }
 
     buildMarker(concert){
-
       const markerEl = document.createElement('div');
       markerEl.style.backgroundSize = 'contain';
       markerEl.style.backgroundImage = "url('https://www.mapbox.com/help/demos/custom-markers-gl-js/mapbox-icon.png')";
@@ -57,20 +47,16 @@ export default class Map extends Component {
     }
 
     render(){
-
-
       if (this.props.concerts.length){
         this.props.concerts.forEach(concert => {
           this.markers = this.markers.concat(this.buildMarker(concert))
         })
       }
-
       if (this.markers.length){
         this.markers.forEach(marker => {
           marker.addTo(this.map)
         })
       }
-
       return (
         <div id = "map" ref = {(map) => {this.container = map}} />
       )

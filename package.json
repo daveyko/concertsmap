@@ -6,6 +6,7 @@
   "scripts": {
     "start-dev": "webpack -w & nodemon server/index.js",
     "start": "node server",
+    "browserTest": "webpack --config webpack.test.js && open tests/test.html",
     "testHome": "mocha --require mock-local-storage --require ignore-styles --require babel-core/register --require babel-polyfill ./tests/Home.spec.js --compilers js:babel-register",
     "build-client": "webpack",
     "deploy": "git checkout -b deploy && webpack -p && git add -f public/bundle.js public/bundle.js.map && git commit --allow-empty -m 'Deploying' && git push --force heroku deploy:master && git checkout master && git branch -D deploy"
@@ -51,6 +52,7 @@
     "express": "^4.13.3",
     "express-session": "^1.15.6",
     "mapbox-gl": "^0.40.1",
+    "material-ui": "^1.0.0-beta.31",
     "moment": "^2.20.1",
     "nunjucks": "^2.5.2",
     "passport": "^0.4.0",
