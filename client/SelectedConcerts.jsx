@@ -1,44 +1,72 @@
 import React, {Component} from 'react'
+import {withStyles} from 'material-ui/styles'
+import {MenuItem} from 'material-ui/Menu'
+import Select from 'material-ui/Select'
+import {FormControl} from 'material-ui/Form'
+import Button from 'material-ui/Button'
+const styles = theme => ({
+  button: {
+    margin: theme.spacing.unit
+  },
+  input: {
+    display: 'none'
+  },
+  container: {
+    display: 'flex',
+    flexWrap: 'wrap',
+  },
+  formControl: {
+    margin: theme.spacing.unit,
+    minWidth: 120,
+  },
+  selectEmpty: {
+    marginTop: theme.spacing.unit * 2,
+  },
+})
 
-export default class SelectedConcerts extends Component{
-
-
+class SelectedConcerts extends Component{
   constructor(props){
-
       super(props)
       this.state = {
-        filterSelected: null
+        filter: null
       }
       this.handleFilter = this.handleFilter.bind(this)
   }
 
   handleFilter(e){
     this.setState({
-      filterSelected: e.target.value
+      filter: e.target.value
     })
   }
 
 
   render(){
+    const { classes } = this.props;
     return (
       <div className="panel" id="selected-concerts">
         <div>
           <h2>Filter By</h2>
           <div className = "filter">
-            <select id="filter" onChange = {this.handleFilter}>
-              <option>Choose Filter</option>
-              <option value = "popularity">Popularity</option>
-            </select>
-            <button onClick = { () => {
-              if (this.state.filterSelected) this.props.sortSelectedConcerts()}}>filter</button>
+          {this.props.selectedConcerts.length ?
+            <FormControl className={classes.formControl}>
+                <Select
+                id="genres" value = {this.state.filter}
+                onChange = {(e) => {
+                  this.handleFilter(e)
+                  this.props.sortSelectedConcerts(e.target.value)
+                }}>
+                <MenuItem value = "popularity">popularity</MenuItem>
+                </Select>
+            </FormControl> : null}
           </div>
         </div>
         <div>
           <h2>Selected Concerts</h2>
+          {this.props.startDate ?
             <div className = "filter">
-              <button onClick = {this.props.selectAllConcerts}>Select All</button>
-              <button onClick = {this.props.removeAllConcerts}>Remove All</button>
-            </div>
+              <Button raised onClick = {this.props.selectAllConcerts}>Select All</Button>
+              <Button raised onClick = {this.props.removeAllConcerts}>Remove All</Button>
+            </div> : null }
         </div>
         {this.props.selectedConcerts.map(selectedConcert => {
           let firstConcertWithImage = selectedConcert.performance.filter(performanceObj => {
@@ -63,3 +91,4 @@ export default class SelectedConcerts extends Component{
   }
 }
 
+export default withStyles(styles)(SelectedConcerts)

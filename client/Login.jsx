@@ -5,7 +5,7 @@ const Modal = require('react-bootstrap-modal')
 const ModalComponent = (props) => {
   return (
     <div>
-    <Modal show = {props.modal} onHide = {props.toggleModal('modal')} aria-labelledby="ModalHeader" >
+    <Modal show = {props.modal} onHide = {props.toggleModal} aria-labelledby="ModalHeader" >
       <Modal.Header />
           <Modal.Body>
             <div className = "sign-in-wrapper">
