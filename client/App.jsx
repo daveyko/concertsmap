@@ -183,11 +183,11 @@ export default class Home extends Component{
       return {cached: JSON.parse(localStorage.getItem(JSON.stringify(date)))}
     } else {
       //we need to make an initial request to songkick for all concerts on a specific date
-      rawAjaxConcerts = await axios.get(`http://api.songkick.com/api/3.0/metro_areas/7644/calendar.json?apikey=SplxOabkNDI5R6lO&min_date=${date.format('YYYY-MM-DD')}&max_date=${date.format('YYYY-MM-DD')}`)
+      rawAjaxConcerts = await axios.get(`https://api.songkick.com/api/3.0/metro_areas/7644/calendar.json?apikey=SplxOabkNDI5R6lO&min_date=${date.format('YYYY-MM-DD')}&max_date=${date.format('YYYY-MM-DD')}`)
       totalPages = Math.ceil(rawAjaxConcerts.data.resultsPage.totalEntries / 50)
       //for each page of the result, we store the request in an array of promises
       for (let page = 1; page <= totalPages; page++){
-        requestPromise = axios.get(`http://api.songkick.com/api/3.0/metro_areas/7644/calendar.json?apikey=SplxOabkNDI5R6lO&min_date=${date.format('YYYY-MM-DD')}&max_date=${date.format('YYYY-MM-DD')}&page=${page}`)
+        requestPromise = axios.get(`https://api.songkick.com/api/3.0/metro_areas/7644/calendar.json?apikey=SplxOabkNDI5R6lO&min_date=${date.format('YYYY-MM-DD')}&max_date=${date.format('YYYY-MM-DD')}&page=${page}`)
         getRequestPromises.push(requestPromise)
       }
       allConcerts = await Promise.all(getRequestPromises)
