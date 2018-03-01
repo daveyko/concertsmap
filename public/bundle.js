@@ -54666,7 +54666,7 @@ var Home = function (_Component) {
 
               case 9:
                 _context4.next = 11;
-                return _axios2.default.get('http://api.songkick.com/api/3.0/metro_areas/7644/calendar.json?apikey=SplxOabkNDI5R6lO&min_date=' + date.format('YYYY-MM-DD') + '&max_date=' + date.format('YYYY-MM-DD'));
+                return _axios2.default.get('https://api.songkick.com/api/3.0/metro_areas/7644/calendar.json?apikey=SplxOabkNDI5R6lO&min_date=' + date.format('YYYY-MM-DD') + '&max_date=' + date.format('YYYY-MM-DD'));
 
               case 11:
                 rawAjaxConcerts = _context4.sent;
@@ -54674,7 +54674,7 @@ var Home = function (_Component) {
                 totalPages = Math.ceil(rawAjaxConcerts.data.resultsPage.totalEntries / 50);
                 //for each page of the result, we store the request in an array of promises
                 for (page = 1; page <= totalPages; page++) {
-                  requestPromise = _axios2.default.get('http://api.songkick.com/api/3.0/metro_areas/7644/calendar.json?apikey=SplxOabkNDI5R6lO&min_date=' + date.format('YYYY-MM-DD') + '&max_date=' + date.format('YYYY-MM-DD') + '&page=' + page);
+                  requestPromise = _axios2.default.get('https://api.songkick.com/api/3.0/metro_areas/7644/calendar.json?apikey=SplxOabkNDI5R6lO&min_date=' + date.format('YYYY-MM-DD') + '&max_date=' + date.format('YYYY-MM-DD') + '&page=' + page);
                   getRequestPromises.push(requestPromise);
                 }
                 _context4.next = 16;
