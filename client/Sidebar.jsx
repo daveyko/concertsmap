@@ -6,6 +6,7 @@ import {MenuItem} from 'material-ui/Menu'
 import Select from 'material-ui/Select'
 import {FormControl} from 'material-ui/Form'
 import TextField from 'material-ui/TextField'
+import DropdownContainer from './utils/DropdownContainer.jsx'
 require('react-datepicker/dist/react-datepicker.css')
 
 const styles = theme => ({
@@ -39,7 +40,7 @@ class Sidebar extends Component {
   }
 
   render(){
-    const { classes } = this.props;
+    console.log('genres!', this.props.genres)
     return (
       <aside>
       <div className="panel" id="options-panel">
@@ -56,24 +57,7 @@ class Sidebar extends Component {
           <h2>Select Genre</h2>
             <div className = "filter">
             {this.props.startDate ?
-              <form className={classes.container} autoComplete="off">
-                <FormControl className={classes.formControl}>
-                  <Select
-                  id="genres" value = {this.state.genre}
-                  onChange = {(e) => {
-                    this.handleGenreSelect(e)
-                    this.props.filterConcertsByGenre(e.target.value)
-                  }}>
-                  <MenuItem value = "all">All</MenuItem>
-                  <MenuItem value = "n/a">N/A</MenuItem>
-                  {this.props.genres.map((genre, i) => {
-                    return (
-                      <MenuItem key ={i} value = {genre}>{genre}</MenuItem>
-                    )
-                  })}
-                  </Select>
-               </FormControl>
-              </form>
+              <DropdownContainer genres = {this.props.genres} filterByGenre = {this.props.filterConcertsByGenre} />
                : null}
           </div>
         </div>

@@ -6037,7 +6037,7 @@ $exports.store = store;
 
 
 var bind = __webpack_require__(416);
-var isBuffer = __webpack_require__(853);
+var isBuffer = __webpack_require__(855);
 
 /*global toString:true*/
 
@@ -12891,7 +12891,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 /* WEBPACK VAR INJECTION */(function(process) {
 
 var utils = __webpack_require__(37);
-var normalizeHeaderName = __webpack_require__(855);
+var normalizeHeaderName = __webpack_require__(857);
 
 var DEFAULT_CONTENT_TYPE = {
   'Content-Type': 'application/x-www-form-urlencoded'
@@ -31124,7 +31124,7 @@ exports.default = (0, _withStyles2.default)(styles, { name: 'MuiFormHelperText' 
 /* 415 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(852);
+module.exports = __webpack_require__(854);
 
 /***/ }),
 /* 416 */
@@ -31152,12 +31152,12 @@ module.exports = function bind(fn, thisArg) {
 /* WEBPACK VAR INJECTION */(function(process) {
 
 var utils = __webpack_require__(37);
-var settle = __webpack_require__(856);
-var buildURL = __webpack_require__(858);
-var parseHeaders = __webpack_require__(859);
-var isURLSameOrigin = __webpack_require__(860);
+var settle = __webpack_require__(858);
+var buildURL = __webpack_require__(860);
+var parseHeaders = __webpack_require__(861);
+var isURLSameOrigin = __webpack_require__(862);
 var createError = __webpack_require__(418);
-var btoa = (typeof window !== 'undefined' && window.btoa && window.btoa.bind(window)) || __webpack_require__(861);
+var btoa = (typeof window !== 'undefined' && window.btoa && window.btoa.bind(window)) || __webpack_require__(863);
 
 module.exports = function xhrAdapter(config) {
   return new Promise(function dispatchXhrRequest(resolve, reject) {
@@ -31254,7 +31254,7 @@ module.exports = function xhrAdapter(config) {
     // This is only done if running in a standard browser environment.
     // Specifically not if we're in a web worker, or react-native.
     if (utils.isStandardBrowserEnv()) {
-      var cookies = __webpack_require__(862);
+      var cookies = __webpack_require__(864);
 
       // Add xsrf header
       var xsrfValue = (config.withCredentials || isURLSameOrigin(config.url)) && config.xsrfCookieName ?
@@ -31339,7 +31339,7 @@ module.exports = function xhrAdapter(config) {
 "use strict";
 
 
-var enhanceError = __webpack_require__(857);
+var enhanceError = __webpack_require__(859);
 
 /**
  * Create an Error with the specified message, config, error code, request and response.
@@ -53999,7 +53999,7 @@ var _App = __webpack_require__(636);
 
 var _App2 = _interopRequireDefault(_App);
 
-var _Login = __webpack_require__(870);
+var _Login = __webpack_require__(872);
 
 var _Login2 = _interopRequireDefault(_Login);
 
@@ -58631,6 +58631,10 @@ var _TextField = __webpack_require__(848);
 
 var _TextField2 = _interopRequireDefault(_TextField);
 
+var _DropdownContainer = __webpack_require__(850);
+
+var _DropdownContainer2 = _interopRequireDefault(_DropdownContainer);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -58639,7 +58643,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-__webpack_require__(850);
+__webpack_require__(852);
 
 var styles = function styles(theme) {
   return {
@@ -58682,10 +58686,7 @@ var Sidebar = function (_Component) {
   }, {
     key: 'render',
     value: function render() {
-      var _this2 = this;
-
-      var classes = this.props.classes;
-
+      console.log('genres!', this.props.genres);
       return _react2.default.createElement(
         'aside',
         null,
@@ -58718,40 +58719,7 @@ var Sidebar = function (_Component) {
             _react2.default.createElement(
               'div',
               { className: 'filter' },
-              this.props.startDate ? _react2.default.createElement(
-                'form',
-                { className: classes.container, autoComplete: 'off' },
-                _react2.default.createElement(
-                  _Form.FormControl,
-                  { className: classes.formControl },
-                  _react2.default.createElement(
-                    _Select2.default,
-                    {
-                      id: 'genres', value: this.state.genre,
-                      onChange: function onChange(e) {
-                        _this2.handleGenreSelect(e);
-                        _this2.props.filterConcertsByGenre(e.target.value);
-                      } },
-                    _react2.default.createElement(
-                      _Menu.MenuItem,
-                      { value: 'all' },
-                      'All'
-                    ),
-                    _react2.default.createElement(
-                      _Menu.MenuItem,
-                      { value: 'n/a' },
-                      'N/A'
-                    ),
-                    this.props.genres.map(function (genre, i) {
-                      return _react2.default.createElement(
-                        _Menu.MenuItem,
-                        { key: i, value: genre },
-                        genre
-                      );
-                    })
-                  )
-                )
-              ) : null
+              this.props.startDate ? _react2.default.createElement(_DropdownContainer2.default, { genres: this.props.genres, filterByGenre: this.props.filterConcertsByGenre }) : null
             )
           )
         ),
@@ -78417,10 +78385,166 @@ exports.default = TextField;
 /* 850 */
 /***/ (function(module, exports, __webpack_require__) {
 
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = __webpack_require__(2);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _DropdownList = __webpack_require__(851);
+
+var _DropdownList2 = _interopRequireDefault(_DropdownList);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var DropdownContainer = function (_Component) {
+  _inherits(DropdownContainer, _Component);
+
+  function DropdownContainer(props) {
+    _classCallCheck(this, DropdownContainer);
+
+    var _this = _possibleConstructorReturn(this, (DropdownContainer.__proto__ || Object.getPrototypeOf(DropdownContainer)).call(this, props));
+
+    _this.state = {
+      display: 'select genre',
+      genres: _this.props.genres,
+      showDropdown: false
+    };
+    _this.handleSelect = _this.handleSelect.bind(_this);
+    _this.toggleShow = _this.toggleShow.bind(_this);
+    return _this;
+  }
+
+  _createClass(DropdownContainer, [{
+    key: 'componentWillReceiveProps',
+    value: function componentWillReceiveProps(nextProps) {
+      if (nextProps.genres !== this.props.genres) {
+        this.setState({
+          genres: nextProps.genres
+        });
+      }
+    }
+  }, {
+    key: 'handleSelect',
+    value: function handleSelect(display) {
+      this.setState({
+        display: display
+      });
+    }
+  }, {
+    key: 'toggleShow',
+    value: function toggleShow(bool) {
+      var _this2 = this;
+
+      document.removeEventListener('click', this.toggleShow);
+      if (_typeof(arguments[0]) === 'object') {
+        this.setState(function (prevState) {
+          return {
+            showDropdown: !prevState.showDropdown
+          };
+        }, function () {
+          if (_this2.state.showDropdown) {
+            document.addEventListener('click', _this2.toggleShow);
+          }
+        });
+      } else {
+        this.setState({
+          showDropdown: bool
+        });
+      }
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      console.log('genres', this.state.genres);
+      return _react2.default.createElement(
+        'div',
+        { className: 'wrapper' },
+        _react2.default.createElement(
+          'div',
+          {
+            onClick: this.toggleShow,
+            className: 'dropdown-top' },
+          _react2.default.createElement(
+            'div',
+            { className: 'text' },
+            this.state.display
+          ),
+          _react2.default.createElement('i', { className: this.state.showDropdown ? 'fa fa-chevron-up' : 'fa fa-chevron-down' })
+        ),
+        this.state.showDropdown ? _react2.default.createElement(_DropdownList2.default, { filterByGenre: this.props.filterByGenre, showDropdown: this.state.showDropdown, toggleShow: this.toggleShow, handleSelect: this.handleSelect, items: this.state.genres }) : null
+      );
+    }
+  }]);
+
+  return DropdownContainer;
+}(_react.Component);
+
+exports.default = DropdownContainer;
+
+/***/ }),
+/* 851 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _react = __webpack_require__(2);
+
+var _react2 = _interopRequireDefault(_react);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var DropdownList = function DropdownList(props) {
+  console.log('props', props);
+  return _react2.default.createElement(
+    'ul',
+    { className: 'items' },
+    props.items ? props.items.map(function (item, idx) {
+      return _react2.default.createElement(
+        'li',
+        {
+          onClick: function onClick() {
+            props.handleSelect(item);
+            props.toggleShow(false);
+            props.filterByGenre(item);
+          },
+          className: 'item',
+          key: idx },
+        item
+      );
+    }) : null
+  );
+};
+exports.default = DropdownList;
+
+/***/ }),
+/* 852 */
+/***/ (function(module, exports, __webpack_require__) {
+
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(851);
+var content = __webpack_require__(853);
 if(typeof content === 'string') content = [[module.i, content, '']];
 // Prepare cssTransformation
 var transform;
@@ -78445,7 +78569,7 @@ if(false) {
 }
 
 /***/ }),
-/* 851 */
+/* 853 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(228)(undefined);
@@ -78459,7 +78583,7 @@ exports.push([module.i, ".react-datepicker-popper[data-placement^=\"bottom\"] .r
 
 
 /***/ }),
-/* 852 */
+/* 854 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -78467,7 +78591,7 @@ exports.push([module.i, ".react-datepicker-popper[data-placement^=\"bottom\"] .r
 
 var utils = __webpack_require__(37);
 var bind = __webpack_require__(416);
-var Axios = __webpack_require__(854);
+var Axios = __webpack_require__(856);
 var defaults = __webpack_require__(187);
 
 /**
@@ -78502,14 +78626,14 @@ axios.create = function create(instanceConfig) {
 
 // Expose Cancel & CancelToken
 axios.Cancel = __webpack_require__(420);
-axios.CancelToken = __webpack_require__(868);
+axios.CancelToken = __webpack_require__(870);
 axios.isCancel = __webpack_require__(419);
 
 // Expose all/spread
 axios.all = function all(promises) {
   return Promise.all(promises);
 };
-axios.spread = __webpack_require__(869);
+axios.spread = __webpack_require__(871);
 
 module.exports = axios;
 
@@ -78518,7 +78642,7 @@ module.exports.default = axios;
 
 
 /***/ }),
-/* 853 */
+/* 855 */
 /***/ (function(module, exports) {
 
 /*!
@@ -78545,7 +78669,7 @@ function isSlowBuffer (obj) {
 
 
 /***/ }),
-/* 854 */
+/* 856 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -78553,8 +78677,8 @@ function isSlowBuffer (obj) {
 
 var defaults = __webpack_require__(187);
 var utils = __webpack_require__(37);
-var InterceptorManager = __webpack_require__(863);
-var dispatchRequest = __webpack_require__(864);
+var InterceptorManager = __webpack_require__(865);
+var dispatchRequest = __webpack_require__(866);
 
 /**
  * Create a new instance of Axios
@@ -78631,7 +78755,7 @@ module.exports = Axios;
 
 
 /***/ }),
-/* 855 */
+/* 857 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -78650,7 +78774,7 @@ module.exports = function normalizeHeaderName(headers, normalizedName) {
 
 
 /***/ }),
-/* 856 */
+/* 858 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -78683,7 +78807,7 @@ module.exports = function settle(resolve, reject, response) {
 
 
 /***/ }),
-/* 857 */
+/* 859 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -78711,7 +78835,7 @@ module.exports = function enhanceError(error, config, code, request, response) {
 
 
 /***/ }),
-/* 858 */
+/* 860 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -78786,7 +78910,7 @@ module.exports = function buildURL(url, params, paramsSerializer) {
 
 
 /***/ }),
-/* 859 */
+/* 861 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -78846,7 +78970,7 @@ module.exports = function parseHeaders(headers) {
 
 
 /***/ }),
-/* 860 */
+/* 862 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -78921,7 +79045,7 @@ module.exports = (
 
 
 /***/ }),
-/* 861 */
+/* 863 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -78964,7 +79088,7 @@ module.exports = btoa;
 
 
 /***/ }),
-/* 862 */
+/* 864 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -79024,7 +79148,7 @@ module.exports = (
 
 
 /***/ }),
-/* 863 */
+/* 865 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -79083,18 +79207,18 @@ module.exports = InterceptorManager;
 
 
 /***/ }),
-/* 864 */
+/* 866 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var utils = __webpack_require__(37);
-var transformData = __webpack_require__(865);
+var transformData = __webpack_require__(867);
 var isCancel = __webpack_require__(419);
 var defaults = __webpack_require__(187);
-var isAbsoluteURL = __webpack_require__(866);
-var combineURLs = __webpack_require__(867);
+var isAbsoluteURL = __webpack_require__(868);
+var combineURLs = __webpack_require__(869);
 
 /**
  * Throws a `Cancel` if cancellation has been requested.
@@ -79176,7 +79300,7 @@ module.exports = function dispatchRequest(config) {
 
 
 /***/ }),
-/* 865 */
+/* 867 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -79203,7 +79327,7 @@ module.exports = function transformData(data, headers, fns) {
 
 
 /***/ }),
-/* 866 */
+/* 868 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -79224,7 +79348,7 @@ module.exports = function isAbsoluteURL(url) {
 
 
 /***/ }),
-/* 867 */
+/* 869 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -79245,7 +79369,7 @@ module.exports = function combineURLs(baseURL, relativeURL) {
 
 
 /***/ }),
-/* 868 */
+/* 870 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -79309,7 +79433,7 @@ module.exports = CancelToken;
 
 
 /***/ }),
-/* 869 */
+/* 871 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -79343,7 +79467,7 @@ module.exports = function spread(callback) {
 
 
 /***/ }),
-/* 870 */
+/* 872 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
