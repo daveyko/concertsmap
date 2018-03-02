@@ -37,7 +37,7 @@ export default class Home extends Component{
     //this function returns a promise that will be resolved after 5 seconds
     //this is used to throttle the requests to spotify so that we don't run into rate limits
     function delay(){
-      return new Promise(resolve => setTimeout(resolve, 5000))
+      return new Promise(resolve => setTimeout(resolve, 1000))
     }
 
     //total number of concerts to gather spotify genre/image data for to pass to loading modal

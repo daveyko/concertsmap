@@ -52831,7 +52831,7 @@ var Home = function (_Component) {
               case 0:
                 delay = function delay() {
                   return new Promise(function (resolve) {
-                    return setTimeout(resolve, 5000);
+                    return setTimeout(resolve, 1000);
                   });
                 };
 
@@ -57138,8 +57138,7 @@ var Sidebar = function (_Component) {
             _react2.default.createElement(_reactDatepicker2.default, {
               dateFormat: 'YYYY-MM-DD',
               selected: this.props.startDate,
-              onChange: this.props.handleDateChange,
-              customInput: _react2.default.createElement(_TextField2.default, { label: 'YYYY-MM-DD', placeholder: 'Placeholder' })
+              onChange: this.props.handleDateChange
             })
           ),
           _react2.default.createElement(

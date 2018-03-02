@@ -1,7 +1,6 @@
 import React, {Component} from 'react'
 import DatePicker from 'react-datepicker'
 import SelectedConcerts from './SelectedConcerts.jsx'
-import TextField from 'material-ui/TextField'
 import DropdownContainer from './utils/DropdownContainer.jsx'
 require('react-datepicker/dist/react-datepicker.css')
 
@@ -31,7 +30,6 @@ class Sidebar extends Component {
           dateFormat="YYYY-MM-DD"
           selected = {this.props.startDate}
           onChange = {this.props.handleDateChange}
-          customInput = {<TextField label = "YYYY-MM-DD" placeholder = "Placeholder" />}
           />
         </div>
         <div>
