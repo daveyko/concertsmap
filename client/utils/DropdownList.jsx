@@ -10,7 +10,7 @@ const DropdownList = (props) => {
               onClick = { () => {
               props.handleSelect(item)
               props.toggleShow(false)
-              props.filterByGenre(item)
+              props.onClick(item)
             }}
               className = "item"
               key = {idx}>{item}

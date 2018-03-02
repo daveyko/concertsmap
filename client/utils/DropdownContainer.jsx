@@ -5,8 +5,8 @@ export default class DropdownContainer extends Component{
     constructor(props){
       super(props)
       this.state = {
-        display: 'select genre',
-        genres: this.props.genres,
+        display: this.props.display,
+        items: this.props.items,
         showDropdown: false
       }
       this.handleSelect = this.handleSelect.bind(this)
@@ -14,9 +14,9 @@ export default class DropdownContainer extends Component{
     }
 
     componentWillReceiveProps(nextProps){
-      if (nextProps.genres !== this.props.genres){
+      if (nextProps.items !== this.props.items){
         this.setState({
-          genres: nextProps.genres
+          items: nextProps.items
         })
       }
     }
@@ -48,7 +48,6 @@ export default class DropdownContainer extends Component{
 
 
     render(){
-      console.log('genres', this.state.genres)
       return (
         <div className = "wrapper">
             <div
@@ -57,7 +56,7 @@ export default class DropdownContainer extends Component{
               <div className = "text">{this.state.display}</div>
               <i className = {this.state.showDropdown ? 'fa fa-chevron-up' : 'fa fa-chevron-down'} />
             </div>
-          {this.state.showDropdown ? <DropdownList filterByGenre = {this.props.filterByGenre} showDropdown = {this.state.showDropdown} toggleShow = {this.toggleShow} handleSelect = {this.handleSelect} items = {this.state.genres} /> : null}
+          {this.state.showDropdown ? <DropdownList onClick = {this.props.onClick} showDropdown = {this.state.showDropdown} toggleShow = {this.toggleShow} handleSelect = {this.handleSelect} items = {this.state.items} /> : null}
         </div>
     )
   }
