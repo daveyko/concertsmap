@@ -16,6 +16,28 @@ export default class Home extends Component{
     this.removeAllConcerts = this.removeAllConcerts.bind(this)
   }
 
+  //this prevents unnecessary re-render when we are passing new props to the modal and so the bacgkround map and sidebar don't need to be re-rendered
+  shouldComponentUpdate(nextProps, nextState){
+    if (this.props.concerts !== nextProps.concerts){
+      return true
+    }
+    if (this.props.genres !== nextProps.genres){
+      return true
+    }
+    if (this.state.selectedConcerts !== nextState.selectedConcerts){
+      return true
+    }
+    return false
+  }
+
+  componentWillReceiveProps(nextProps){
+    if (this.props.startDate !== nextProps.startDate){
+      this.setState({
+        selectedConcerts: []
+      })
+    }
+  }
+
   //this class contains methods to filter concerts and select/remove concerts to/from the sidebar component
 
   selectAllConcerts(){
@@ -57,7 +79,7 @@ export default class Home extends Component{
   }
 
   sortSelectedConcerts(criteria){
-    let sorted = this.state.selectedConcerts.sort((a, b) => {
+    let sorted = this.state.selectedConcerts.slice().sort((a, b) => {
       return b[criteria] - a[criteria]
     })
     this.setState({

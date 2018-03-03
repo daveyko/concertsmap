@@ -33,7 +33,7 @@ const SelectedConcerts = (props) => {
           })
           let imageSrc = firstConcertWithImage.length ? firstConcertWithImage[0].image : '/not-found.png'
           return (
-          <article className = "concert-wrapper">
+          <article key = {selectedConcert.id} className = "concert-wrapper">
             <button
               onClick = {() => {
               props.removeConcert(selectedConcert)}} id = "x">X</button>

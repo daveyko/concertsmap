@@ -18,6 +18,7 @@ i.fa-spotify{
 .logoutRefresh{
   display: flex;
   align-items: center;
+  cursor: pointer;
 }
 
 i.fa-refresh{
@@ -147,6 +148,7 @@ select {
   border-radius: 50%;
   background-color: #aaa;
   display:none;
+  cursor: pointer;
 }
 
 .concert-wrapper:hover #x{
@@ -278,6 +280,7 @@ select {
   border: 0.1rem solid #ccd4d8;
   border-bottom: 0;
   border-radius: 0.2rem 0.2rem 0 0;
+  cursor: pointer;
 }
 
 .dropdown-top{
@@ -323,6 +326,7 @@ select {
   display: flex;
   align-items: center;
   flex-direction: column;
+  cursor: pointer;
 }
 
 .button-select{
