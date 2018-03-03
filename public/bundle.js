@@ -50011,7 +50011,6 @@ var Home = function (_Component) {
   }, {
     key: 'render',
     value: function render() {
-      console.log('rerender container!');
       return _react2.default.createElement(
         'div',
         { id: 'app' },
