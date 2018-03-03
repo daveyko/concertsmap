@@ -37,7 +37,7 @@ export default class Home extends Component{
     //this function returns a promise that will be resolved after 5 seconds
     //this is used to throttle the requests to spotify so that we don't run into rate limits
     function delay(){
-      return new Promise(resolve => setTimeout(resolve, 1000))
+      return new Promise(resolve => setTimeout(resolve, 1500))
     }
 
     //total number of concerts to gather spotify genre/image data for to pass to loading modal
@@ -49,7 +49,7 @@ export default class Home extends Component{
       totalRequestsToProcess: totalToProcess
     })
 
-    //for all sets of 25 concerts, after sending 25 spotify requests we pause the for loop for 5 seconds
+    //for all sets of 25 concerts, after sending 25 spotify requests we pause the for loop for 1.5 seconds
     //before sending the next batch of 25 api requests
     for (let i = 0; i < combinedData.length; i++){
         try {
@@ -67,11 +67,16 @@ export default class Home extends Component{
 
   async getGenreWrapper(combinedData){
     //the wrapper actually calls the function that will send an api request to spotify
+    let increment = 3
     for (let i = 0; i < combinedData.length; i++){
       let performance = combinedData[i].performance
-      this.setState(prevState => {
-        return {rawNumRequestProcessed: prevState.rawNumRequestProcessed + 1}
-      })
+      increment--
+      if (!increment){
+        this.setState(prevState => {
+          return {rawNumRequestProcessed: prevState.rawNumRequestProcessed + 3}
+        })
+        increment = 3
+      }
       for (let j = 0; j < performance.length; j++){
         try {
           //we await the aggregate genres array and image of the first artist with an available image
@@ -238,6 +243,10 @@ export default class Home extends Component{
       this.props.handleRefresh()
       .then(() => {
         this.handleDateChange(date)
+      })
+    } else if (err.response && err.response.status === 502) {
+      this.setState({
+        errorMessage: 'Request failed. Please try clearing cache/cookies for this url, and refresh the page, or try in a different browser/incognito mode.'
       })
     } else {
       this.setState({

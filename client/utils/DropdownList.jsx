@@ -1,7 +1,6 @@
 import React from 'react'
 
 const DropdownList = (props) => {
-    console.log('props', props)
     return (
       <ul className = "items">
         {props.items ? props.items.map((item, idx) => {
